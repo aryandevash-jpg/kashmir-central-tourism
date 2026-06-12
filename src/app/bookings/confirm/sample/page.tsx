@@ -1,0 +1,5 @@
+import { redirect } from "next/navigation";
+
+export default function LegacySampleConfirmationPage() {
+  redirect("/bookings/confirm/preview/gondola");
+}
