@@ -9,7 +9,7 @@ import {
   IconMountain,
   IconSettings,
 } from "@/components/icons";
-import { MobileNavDrawer } from "@/components/MobileNavDrawer";
+import { MobileNavDrawer, type MobileNavItem } from "@/components/MobileNavDrawer";
 import { cn } from "@/lib/utils";
 import type { AuthProfile } from "@/lib/auth/session";
 import type { Operator } from "@/lib/types";
@@ -23,7 +23,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-const baseNavItems = [
+const baseNavItems: MobileNavItem[] = [
   { href: "/operator", label: "Dashboard", icon: IconChart, exact: true },
   { href: "/operator/bookings", label: "Bookings", icon: IconCalendar },
   { href: "/operator/activities", label: "Activities", icon: IconMountain },
@@ -31,7 +31,7 @@ const baseNavItems = [
   { href: "/operator/settings", label: "Settings", icon: IconSettings },
 ];
 
-function buildNavItems(bookingCount: number) {
+function buildNavItems(bookingCount: number): MobileNavItem[] {
   return baseNavItems.map((item) =>
     item.href === "/operator/bookings" ? { ...item, badge: bookingCount } : item
   );
@@ -42,7 +42,7 @@ function SidebarNav({
   navItems,
 }: {
   pathname: string;
-  navItems: ReturnType<typeof buildNavItems>;
+  navItems: MobileNavItem[];
 }) {
   return (
     <>
