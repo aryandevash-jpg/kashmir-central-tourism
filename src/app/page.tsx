@@ -1,17 +1,37 @@
 import Link from "next/link";
 import { IconBuilding, IconCompass, IconMountain } from "@/components/icons";
+import { getAuthProfile } from "@/lib/auth/session";
+import {
+  entryHrefForPortal,
+  roleMatchesPortal,
+  type Portal,
+} from "@/lib/auth/roles";
 
 const glassCard =
   "rounded-2xl border border-white/70 bg-white/55 shadow-[0_8px_32px_rgba(15,23,42,0.2)] ring-1 ring-white/80 backdrop-blur-xl";
 
-const profiles = [
+const profiles: {
+  portal: Portal;
+  signupHref?: string;
+  title: string;
+  label: string;
+  subtitle: string;
+  signInCta: string;
+  continueCta: string;
+  signupCta?: string;
+  icon: typeof IconCompass;
+  accent: string;
+  iconBg: string;
+  hover: string;
+}[] = [
   {
-    href: "/auth/login?portal=tourist",
+    portal: "tourist",
     signupHref: "/auth/signup",
     title: "Tourist",
     label: "For travellers",
     subtitle: "Discover activities, book slots & manage reservations",
-    cta: "Sign in as Visitor",
+    signInCta: "Sign in as Visitor",
+    continueCta: "Continue as Visitor",
     signupCta: "Create visitor account",
     icon: IconCompass,
     accent: "border-t-blue-500",
@@ -19,22 +39,24 @@ const profiles = [
     hover: "hover:border-blue-300/80 hover:bg-white/70 hover:shadow-blue-900/15",
   },
   {
-    href: "/auth/login?portal=operator",
+    portal: "operator",
     title: "Operator / Vendor",
     label: "For vendors",
     subtitle: "Manage activities, bookings & revenue",
-    cta: "Sign in as Vendor",
+    signInCta: "Sign in as Vendor",
+    continueCta: "Continue as Vendor",
     icon: IconMountain,
     accent: "border-t-emerald-500",
     iconBg: "bg-emerald-500 shadow-emerald-500/30",
     hover: "hover:border-emerald-300/80 hover:bg-white/70 hover:shadow-emerald-900/15",
   },
   {
-    href: "/auth/login?portal=gov",
+    portal: "gov",
     title: "Government Officer",
     label: "For officials",
     subtitle: "Monitor compliance, analytics & safety",
-    cta: "Sign in as Officer",
+    signInCta: "Sign in as Officer",
+    continueCta: "Continue as Officer",
     icon: IconBuilding,
     accent: "border-t-slate-700",
     iconBg: "bg-slate-800 shadow-slate-800/30",
@@ -42,7 +64,9 @@ const profiles = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const profile = await getAuthProfile();
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       <video
@@ -75,53 +99,60 @@ export default function HomePage() {
         <div className="grid w-full max-w-4xl gap-5 md:grid-cols-3">
           {profiles.map(
             ({
-              href,
+              portal,
               signupHref,
               title,
               label,
               subtitle,
-              cta,
+              signInCta,
+              continueCta,
               signupCta,
               icon: Icon,
               accent,
               iconBg,
               hover,
-            }) => (
-              <div
-                key={href}
-                className={`group flex flex-col border-t-4 p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6 ${glassCard} ${accent} ${hover}`}
-              >
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  {label}
-                </p>
+            }) => {
+              const href = entryHrefForPortal(portal, profile?.role);
+              const hasSession = profile?.role && roleMatchesPortal(profile.role, portal);
+
+              return (
                 <div
-                  className={`mb-4 mt-4 flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg transition-transform group-hover:scale-110 ${iconBg}`}
+                  key={portal}
+                  className={`group flex flex-col border-t-4 p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6 ${glassCard} ${accent} ${hover}`}
                 >
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{subtitle}</p>
-                <div className="mt-5 space-y-2">
-                  <Link
-                    href={href}
-                    className="block text-sm font-semibold text-blue-700 group-hover:underline"
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    {label}
+                  </p>
+                  <div
+                    className={`mb-4 mt-4 flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg transition-transform group-hover:scale-110 ${iconBg}`}
                   >
-                    {cta} →
-                  </Link>
-                  {signupHref && signupCta && (
-                    <Link href={signupHref} className="block text-sm text-slate-600 hover:text-blue-700">
-                      {signupCta} →
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{subtitle}</p>
+                  <div className="mt-5 space-y-2">
+                    <Link
+                      href={href}
+                      className="block text-sm font-semibold text-blue-700 group-hover:underline"
+                    >
+                      {hasSession ? continueCta : signInCta} →
                     </Link>
-                  )}
+                    {signupHref && signupCta && !hasSession && (
+                      <Link href={signupHref} className="block text-sm text-slate-600 hover:text-blue-700">
+                        {signupCta} →
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ),
+              );
+            },
           )}
         </div>
 
         <div className={`flex w-full max-w-4xl flex-col items-center gap-3 px-5 py-4 text-center sm:px-8 sm:py-5 ${glassCard}`}>
           <p className="text-sm text-slate-600">
-            Visitors can create their own account. Vendors and government users are provisioned by the Tourism Department.
+            Visitors can create their own account. Vendors and government users are provisioned by the
+            Tourism Department.
           </p>
         </div>
       </div>
