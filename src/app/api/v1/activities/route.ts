@@ -54,7 +54,9 @@ export async function POST(request: Request) {
     const durationMinutes = typeof raw.durationMinutes === "number" ? raw.durationMinutes : 120;
     const basePrice = typeof raw.basePrice === "number" ? raw.basePrice : 1000;
     const coverImageUrl =
-      typeof raw.coverImageUrl === "string" ? raw.coverImageUrl : "/activities/default.jpg";
+      typeof raw.coverImageUrl === "string"
+        ? raw.coverImageUrl
+        : "/activities/default.jpg";
     const includes = Array.isArray(raw.includes)
       ? raw.includes.filter((i): i is string => typeof i === "string")
       : [];
