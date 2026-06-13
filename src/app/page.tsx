@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { preload } from "react-dom";
 import { IconBuilding, IconCompass, IconMountain } from "@/components/icons";
+import { HomeHeroVideo } from "@/components/HomeHeroVideo";
 import { getAuthProfile } from "@/lib/auth/session";
 import {
   entryHrefForPortal,
   roleMatchesPortal,
   type Portal,
 } from "@/lib/auth/roles";
+
+const HERO_POSTER = "/videos/kashmir-himalayas-poster.jpg";
 
 const glassCard =
   "rounded-2xl border border-white/70 bg-white/55 shadow-[0_8px_32px_rgba(15,23,42,0.2)] ring-1 ring-white/80 backdrop-blur-xl";
@@ -65,21 +69,18 @@ const profiles: {
 ];
 
 export default async function HomePage() {
+  preload(HERO_POSTER, { as: "image" });
   const profile = await getAuthProfile();
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 h-full w-full scale-105 object-cover brightness-125 saturate-110"
-        aria-hidden
-      >
-        <source src="/videos/kashmir-himalayas.mp4" type="video/mp4" />
-      </video>
+      <div className="absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute inset-0 scale-105 bg-cover bg-center brightness-125 saturate-110"
+          style={{ backgroundImage: `url(${HERO_POSTER})` }}
+        />
+        <HomeHeroVideo />
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/15 via-transparent to-slate-900/25" />
 

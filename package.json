@@ -11,7 +11,8 @@
     "db:seed-auth": "node scripts/seed-auth-users.mjs",
     "db:verify-auth": "node scripts/verify-auth.mjs",
     "db:apply-auth": "node scripts/apply-auth-rls.mjs",
-    "images:fetch": "node scripts/fetch-activity-images.mjs"
+    "images:fetch": "node scripts/fetch-activity-images.mjs",
+    "video:optimize": "node scripts/optimize-hero-video.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
