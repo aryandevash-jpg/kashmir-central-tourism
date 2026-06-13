@@ -59,15 +59,18 @@ export function mapActivity(
     includes,
     rating,
     reviewCount,
+    elevation: row.elevation ?? undefined,
   };
 }
 
 export function mapSlot(row: DbSlot): Slot {
   const full = row.booked_count >= row.capacity;
+  const slotDate =
+    typeof row.slot_date === "string" ? row.slot_date.slice(0, 10) : String(row.slot_date);
   return {
     id: row.id,
     activityId: row.activity_id,
-    slotDate: row.slot_date,
+    slotDate,
     slotTime: row.slot_time.length > 5 ? row.slot_time.slice(0, 5) : row.slot_time,
     capacity: row.capacity,
     bookedCount: row.booked_count,

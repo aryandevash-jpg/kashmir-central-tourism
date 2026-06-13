@@ -8,6 +8,8 @@ import {
   getSlotsForActivity,
 } from "@/lib/services";
 
+export const dynamic = "force-dynamic";
+
 export default async function BookSlotPage({
   params,
 }: {
@@ -24,7 +26,7 @@ export default async function BookSlotPage({
   if (!activity) notFound();
 
   return (
-    <div className="min-h-screen bg-[#f0f7ff]">
+    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
       <BookSlotForm
         activity={activity}

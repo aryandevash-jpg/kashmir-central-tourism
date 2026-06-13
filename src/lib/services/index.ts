@@ -1,7 +1,7 @@
 /**
  * Next.js backend service layer.
- * Server Components and /api/v1 routes both call these functions.
- * Connects to Supabase when env vars are set; falls back to local data otherwise.
+ * Server Components and /api/v1 routes call these functions.
+ * All data access requires Supabase to be configured.
  */
 
 export {
@@ -9,6 +9,7 @@ export {
   getActivityById,
   getOperatorForActivity,
   getActivitiesByOperator,
+  createActivity,
 } from "@/lib/data/activities";
 
 export {
@@ -17,14 +18,17 @@ export {
   getSlotByActivityDateTime,
 } from "@/lib/data/slots";
 
-export { getOperators, getOperatorById } from "@/lib/data/operators";
+export {
+  getOperators,
+  getOperatorById,
+  getOperatorByUserId,
+  createOperator,
+} from "@/lib/data/operators";
 
 export {
   getBookingsForUser,
   getOperatorBookings,
   createBooking,
-  DEMO_TOURIST_ID,
-  DEMO_OPERATOR_ID,
 } from "@/lib/data/bookings";
 
 export type {
@@ -34,6 +38,11 @@ export type {
 } from "@/lib/data/bookings";
 
 export { getDistricts } from "@/lib/data/districts";
-export { getIncidents } from "@/lib/data/incidents";
+export {
+  getIncidents,
+  getIncidentsByReporter,
+  updateIncidentStatus,
+  createIncident,
+} from "@/lib/data/incidents";
 
 export { isSupabaseConfigured } from "@/lib/supabase/server";

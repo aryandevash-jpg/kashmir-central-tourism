@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { TouristNav } from "@/components/tourist/TouristNav";
 import { IconHeart } from "@/components/icons";
+import { authOrRedirect } from "@/lib/auth/guards";
 
-export default function SavedPage() {
+export default async function SavedPage() {
+  await authOrRedirect("/saved");
   return (
-    <div className="min-h-screen bg-[#f0f7ff]">
+    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
       <div className="mx-auto max-w-4xl px-6 py-16 text-center">
         <IconHeart className="mx-auto w-12 h-12 text-slate-300" />

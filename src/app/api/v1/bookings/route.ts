@@ -1,31 +1,28 @@
 import { fail, handleRouteError, ok } from "@/lib/api/http";
+import { handleAuthError } from "@/lib/api/auth";
+import { requireAuth } from "@/lib/auth/session";
 import {
   createBooking,
-  DEMO_TOURIST_ID,
   getActivityById,
   getBookingsForUser,
   getSlotByActivityDateTime,
 } from "@/lib/services";
 import { validateBookingInput } from "@/lib/validation/booking";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId") ?? DEMO_TOURIST_ID;
-
-    if (!userId.trim()) {
-      return fail("userId is required");
-    }
-
-    const bookings = await getBookingsForUser(userId);
+    const profile = await requireAuth();
+    const bookings = await getBookingsForUser(profile.id);
     return ok(bookings);
   } catch (err) {
-    return handleRouteError(err);
+    return handleAuthError(err);
   }
 }
 
 export async function POST(request: Request) {
   try {
+    const profile = await requireAuth();
+
     let body: unknown;
     try {
       body = await request.json();
@@ -41,14 +38,12 @@ export async function POST(request: Request) {
       typeof raw.groupSize === "number" || typeof raw.groupSize === "string"
         ? raw.groupSize
         : NaN;
-    const userId = typeof raw.userId === "string" ? raw.userId : undefined;
 
     const validation = validateBookingInput({
       activityId,
       slotDate,
       slotTime,
       groupSize: groupSize as number,
-      userId,
     });
 
     const parsedSize =
@@ -77,7 +72,7 @@ export async function POST(request: Request) {
     }
 
     const result = await createBooking({
-      userId: userId ?? DEMO_TOURIST_ID,
+      userId: profile.id,
       activityId,
       slotId: slot.id,
       groupSize: parsedSize,
@@ -86,6 +81,6 @@ export async function POST(request: Request) {
 
     return ok(result, 201);
   } catch (err) {
-    return handleRouteError(err);
+    return handleAuthError(err);
   }
 }

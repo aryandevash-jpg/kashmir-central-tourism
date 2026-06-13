@@ -6,33 +6,35 @@ const glassCard =
 
 const profiles = [
   {
-    href: "/explore",
+    href: "/auth/login?portal=tourist",
+    signupHref: "/auth/signup",
     title: "Tourist",
     label: "For travellers",
     subtitle: "Discover activities, book slots & manage reservations",
-    cta: "Continue as Tourist",
+    cta: "Sign in as Visitor",
+    signupCta: "Create visitor account",
     icon: IconCompass,
     accent: "border-t-blue-500",
     iconBg: "bg-blue-500 shadow-blue-500/30",
     hover: "hover:border-blue-300/80 hover:bg-white/70 hover:shadow-blue-900/15",
   },
   {
-    href: "/operator",
+    href: "/auth/login?portal=operator",
     title: "Operator / Vendor",
     label: "For vendors",
     subtitle: "Manage activities, bookings & revenue",
-    cta: "Continue as Operator",
+    cta: "Sign in as Vendor",
     icon: IconMountain,
     accent: "border-t-emerald-500",
     iconBg: "bg-emerald-500 shadow-emerald-500/30",
     hover: "hover:border-emerald-300/80 hover:bg-white/70 hover:shadow-emerald-900/15",
   },
   {
-    href: "/gov",
+    href: "/auth/login?portal=gov",
     title: "Government Officer",
     label: "For officials",
     subtitle: "Monitor compliance, analytics & safety",
-    cta: "Continue as Officer",
+    cta: "Sign in as Officer",
     icon: IconBuilding,
     accent: "border-t-slate-700",
     iconBg: "bg-slate-800 shadow-slate-800/30",
@@ -57,8 +59,8 @@ export default function HomePage() {
 
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/15 via-transparent to-slate-900/25" />
 
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-8 px-4 py-12 sm:px-6">
-        <div className={`w-full max-w-2xl px-8 py-8 text-center ${glassCard}`}>
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-8 sm:gap-8 sm:px-6 sm:py-12">
+        <div className={`w-full max-w-2xl px-5 py-6 text-center sm:px-8 sm:py-8 ${glassCard}`}>
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg shadow-blue-500/30">
             <IconCompass className="h-8 w-8" />
           </div>
@@ -72,11 +74,22 @@ export default function HomePage() {
 
         <div className="grid w-full max-w-4xl gap-5 md:grid-cols-3">
           {profiles.map(
-            ({ href, title, label, subtitle, cta, icon: Icon, accent, iconBg, hover }) => (
-              <Link
+            ({
+              href,
+              signupHref,
+              title,
+              label,
+              subtitle,
+              cta,
+              signupCta,
+              icon: Icon,
+              accent,
+              iconBg,
+              hover,
+            }) => (
+              <div
                 key={href}
-                href={href}
-                className={`group flex flex-col border-t-4 p-6 transition-all duration-300 hover:-translate-y-1 ${glassCard} ${accent} ${hover}`}
+                className={`group flex flex-col border-t-4 p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6 ${glassCard} ${accent} ${hover}`}
               >
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   {label}
@@ -88,23 +101,27 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-lg font-bold text-slate-900">{title}</h2>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{subtitle}</p>
-                <p className="mt-5 text-sm font-semibold text-blue-700 group-hover:underline">
-                  {cta} →
-                </p>
-              </Link>
+                <div className="mt-5 space-y-2">
+                  <Link
+                    href={href}
+                    className="block text-sm font-semibold text-blue-700 group-hover:underline"
+                  >
+                    {cta} →
+                  </Link>
+                  {signupHref && signupCta && (
+                    <Link href={signupHref} className="block text-sm text-slate-600 hover:text-blue-700">
+                      {signupCta} →
+                    </Link>
+                  )}
+                </div>
+              </div>
             ),
           )}
         </div>
 
-        <div className={`flex flex-col items-center gap-3 px-8 py-5 text-center ${glassCard}`}>
-          <Link
-            href="/platform"
-            className="rounded-xl border border-white/80 bg-white/60 px-8 py-3 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-white/70 backdrop-blur-md transition-all hover:bg-white/80 hover:shadow-md"
-          >
-            Platform Overview →
-          </Link>
+        <div className={`flex w-full max-w-4xl flex-col items-center gap-3 px-5 py-4 text-center sm:px-8 sm:py-5 ${glassCard}`}>
           <p className="text-sm text-slate-600">
-            Tourist, operator, and government portals in one system
+            Visitors can create their own account. Vendors and government users are provisioned by the Tourism Department.
           </p>
         </div>
       </div>

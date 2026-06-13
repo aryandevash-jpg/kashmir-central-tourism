@@ -12,7 +12,7 @@ const touristFlows = [
   {
     title: "Book a Slot",
     description: "Calendar picker, time slots, group size, and live pricing",
-    href: "/activities/00000000-0000-0000-0000-000000000020/book",
+    href: "/activities/00000000-0000-0000-0000-000000000200/book",
     tag: "Booking",
   },
   {
@@ -63,7 +63,7 @@ function FlowCard({
 
 export default function PlatformPage() {
   return (
-    <div className="min-h-screen bg-[#f0f7ff]">
+    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
       <div className="mx-auto max-w-5xl px-6 py-10">
         <Link href="/" className="text-sm font-medium text-blue-600 hover:underline">

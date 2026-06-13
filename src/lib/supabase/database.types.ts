@@ -55,6 +55,7 @@ export interface DbActivity {
   cover_image_url: string | null;
   base_price: number;
   is_active: boolean;
+  elevation: string | null;
   created_at: string;
 }
 

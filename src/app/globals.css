@@ -7,6 +7,7 @@
   --primary-dark: #1e40af;
   --gov-dark: #0f172a;
   --gov-sidebar: #f8fafc;
+  --tourist-nav-offset: calc(4.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 @theme inline {
@@ -20,4 +21,19 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.tourist-page {
+  padding-bottom: var(--tourist-nav-offset);
+}
+
+@media (min-width: 768px) {
+  .tourist-page {
+    padding-bottom: 0;
+  }
+}
+
+.tourist-bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }

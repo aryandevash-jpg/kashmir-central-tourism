@@ -1,30 +1,46 @@
-import Image from "next/image";
-import { DEMO_OPERATOR_ID, getActivitiesByOperator } from "@/lib/services";
-import { categoryLabel, formatCurrency, formatDuration } from "@/lib/utils";
+import { getActivitiesByOperator } from "@/lib/services";
+import { requireOperatorId } from "@/lib/auth/session";
+import Link from "next/link";
+import { IconPlus } from "@/components/icons";
+
+export const dynamic = "force-dynamic";
 
 export default async function OperatorActivitiesPage() {
-  const myActivities = await getActivitiesByOperator(DEMO_OPERATOR_ID);
+  const { operatorId } = await requireOperatorId();
+  const myActivities = await getActivitiesByOperator(operatorId);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">Activities</h1>
-      <p className="text-slate-500">Manage your listed tourism experiences</p>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {myActivities.map((a) => (
-          <div key={a.id} className="flex gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <Image src={a.coverImageUrl} alt="" width={100} height={100} className="rounded-xl object-cover" />
-            <div className="flex-1">
-              <p className="font-bold text-slate-900">{a.title}</p>
-              <p className="text-sm text-slate-500">{categoryLabel(a.category)} · {a.district}</p>
-              <p className="mt-1 text-sm">{formatDuration(a.durationMinutes)} · {formatCurrency(a.basePrice)}</p>
-              <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${a.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
-                {a.isActive ? "Active" : "Inactive"}
-              </span>
-            </div>
-          </div>
-        ))}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">My Activities</h1>
+          <p className="text-slate-500">Manage your listed tourism experiences</p>
+        </div>
+        <Link
+          href="/operator/activities/new"
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-600"
+        >
+          <IconPlus className="h-4 w-4" />
+          New Activity
+        </Link>
       </div>
+
+      {myActivities.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-slate-200 bg-white p-12 text-center">
+          <p className="font-medium text-slate-700">No activities yet</p>
+          <p className="mt-1 text-sm text-slate-500">Create your first activity to start receiving bookings.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {myActivities.map((a) => (
+            <div key={a.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="font-semibold text-slate-900">{a.title}</h3>
+              <p className="mt-1 text-sm text-slate-500">{a.district} · {a.category}</p>
+              <p className="mt-2 text-sm font-medium text-blue-600">₹{a.basePrice}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

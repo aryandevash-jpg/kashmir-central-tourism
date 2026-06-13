@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { IconCheck, IconClock, IconStar } from "@/components/icons";
+import { useToast } from "@/components/Toast";
 import type { Incident, Operator } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +33,26 @@ export function IncidentsPanel({
   operators: Operator[];
 }) {
   const [selectedId, setSelectedId] = useState(incidents[0]?.id ?? "");
+  const [incidentStatuses, setIncidentStatuses] = useState<Record<string, string>>({});
+  const { showToast, ToastContainer } = useToast();
+  
   const selected = incidents.find((i) => i.id === selectedId) ?? incidents[0];
   const operator = selected
     ? operators.find((o) => o.id === selected.operatorId)
     : undefined;
+
+  const currentStatus = incidentStatuses[selected?.id] || selected?.status;
+
+  const handleEscalate = () => {
+    if (!selected) return;
+    showToast(`Incident ${selected.incidentCode} escalated to Commissioner's office`, "warning");
+  };
+
+  const handleMarkResolved = () => {
+    if (!selected) return;
+    setIncidentStatuses((prev) => ({ ...prev, [selected.id]: "RESOLVED" }));
+    showToast(`Incident ${selected.incidentCode} marked as resolved`, "success");
+  };
 
   if (!selected) {
     return <p className="text-slate-500">No incidents recorded.</p>;
@@ -101,9 +118,9 @@ export function IncidentsPanel({
         </div>
 
         <div className="lg:col-span-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">{selected.title}</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">{selected.title}</h2>
               <p className="text-sm text-slate-500">
                 {selected.incidentCode} · {new Date(selected.occurredAt).toLocaleString("en-IN")}
               </p>
@@ -156,16 +173,27 @@ export function IncidentsPanel({
             </div>
           </div>
 
-          <div className="mt-8 flex gap-4">
-            <button type="button" className="flex-1 rounded-xl border-2 border-red-300 py-3 text-sm font-semibold text-red-600 hover:bg-red-50">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <button 
+              type="button" 
+              onClick={handleEscalate}
+              disabled={currentStatus === "RESOLVED"}
+              className="flex-1 rounded-xl border-2 border-red-300 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               ↑ Escalate to Commissioner
             </button>
-            <button type="button" className="flex-1 rounded-xl border-2 border-green-400 py-3 text-sm font-semibold text-green-600 hover:bg-green-50">
-              ✓ Mark Resolved
+            <button 
+              type="button" 
+              onClick={handleMarkResolved}
+              disabled={currentStatus === "RESOLVED"}
+              className="flex-1 rounded-xl border-2 border-green-400 py-3 text-sm font-semibold text-green-600 hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {currentStatus === "RESOLVED" ? "✓ Resolved" : "✓ Mark Resolved"}
             </button>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 }

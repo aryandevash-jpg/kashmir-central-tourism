@@ -15,7 +15,7 @@ export default async function PreviewConfirmationPage({
   const { subtotal, taxes, total } = sampleTotals(entry);
 
   return (
-    <div className="min-h-screen bg-[#f0f7ff]">
+    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
       <BookingConfirmation
         status={entry.status}

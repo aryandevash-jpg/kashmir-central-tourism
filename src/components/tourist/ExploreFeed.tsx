@@ -9,9 +9,11 @@ import { categoryLabel, cn, formatCurrency } from "@/lib/utils";
 
 const categories: (ActivityCategory | "ALL")[] = [
   "ALL",
+  "GONDOLA",
   "TREKKING",
   "WATER_TOUR",
   "SKIING",
+  "RAFTING",
   "SIGHTSEEING",
 ];
 
@@ -31,21 +33,21 @@ export function ExploreFeed({ activities }: { activities: Activity[] }) {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-8 flex items-start justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 flex items-start justify-between sm:mb-8">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-blue-500">
             {greeting()}
           </p>
           <div className="mt-1 flex items-center gap-2">
-            <IconLocation className="w-5 h-5 text-blue-500" />
-            <h1 className="text-2xl font-bold text-slate-900">Kashmir, India</h1>
+            <IconLocation className="h-5 w-5 shrink-0 text-blue-500" />
+            <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">Kashmir, India</h1>
             <span className="text-slate-400">▾</span>
           </div>
         </div>
       </div>
 
-      <div className="mb-8 flex gap-3 overflow-x-auto pb-2">
+      <div className="-mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-2 sm:mb-8 sm:gap-3">
         {categories.map((cat) => (
           <button
             key={cat}
@@ -95,7 +97,7 @@ export function ExploreFeed({ activities }: { activities: Activity[] }) {
                     <span className="font-semibold">{activity.rating || "—"}</span>
                     <span className="text-white/70">({activity.reviewCount} reviews)</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-white">{activity.title}</h2>
+                  <h2 className="text-xl font-bold text-white sm:text-2xl">{activity.title}</h2>
                   <div className="mt-3 flex justify-end">
                     <span className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-blue-600">
                       {formatCurrency(activity.basePrice)} / person

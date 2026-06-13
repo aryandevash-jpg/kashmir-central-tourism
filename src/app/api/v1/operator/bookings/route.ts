@@ -1,13 +1,14 @@
 import { handleRouteError, ok } from "@/lib/api/http";
-import { DEMO_OPERATOR_ID, getOperatorBookings } from "@/lib/services";
+import { handleAuthError } from "@/lib/api/auth";
+import { requireOperatorId } from "@/lib/auth/session";
+import { getOperatorBookings } from "@/lib/services";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const operatorId = searchParams.get("operatorId") ?? DEMO_OPERATOR_ID;
+    const { operatorId } = await requireOperatorId();
     const bookings = await getOperatorBookings(operatorId);
     return ok(bookings);
   } catch (err) {
-    return handleRouteError(err);
+    return handleAuthError(err);
   }
 }

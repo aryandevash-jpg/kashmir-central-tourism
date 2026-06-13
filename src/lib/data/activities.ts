@@ -1,11 +1,8 @@
-import {
-  activities as mockActivities,
-  getActivityById as mockGetActivityById,
-  getOperatorForActivity as mockGetOperatorForActivity,
-} from "@/lib/mock-data";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
+import { requireSupabase } from "@/lib/supabase/require";
 import type { DbActivity, DbOperator } from "@/lib/supabase/database.types";
 import type { Activity, ActivityCategory, Operator } from "@/lib/types";
+import { generateDefaultSlotsForActivity } from "./slots";
 import { mapActivity, mapOperator } from "./mappers";
 
 async function enrichActivities(rows: DbActivity[]): Promise<Activity[]> {
@@ -60,85 +57,109 @@ async function fetchActivityRows(category?: ActivityCategory): Promise<DbActivit
 }
 
 export async function getActivities(category?: ActivityCategory): Promise<Activity[]> {
-  if (!isSupabaseConfigured()) {
-    return category
-      ? mockActivities.filter((a) => a.category === category)
-      : mockActivities;
-  }
-
-  try {
-    const rows = await fetchActivityRows(category);
-    if (rows.length === 0) {
-      return category
-        ? mockActivities.filter((a) => a.category === category)
-        : mockActivities;
-    }
-    return enrichActivities(rows);
-  } catch {
-    return category
-      ? mockActivities.filter((a) => a.category === category)
-      : mockActivities;
-  }
+  requireSupabase();
+  const rows = await fetchActivityRows(category);
+  return enrichActivities(rows);
 }
 
 export async function getActivityById(id: string): Promise<Activity | undefined> {
-  if (!isSupabaseConfigured()) return mockGetActivityById(id);
+  requireSupabase();
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("activities").select("*").eq("id", id).single();
 
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("activities")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error || !data) return mockGetActivityById(id);
-    const [activity] = await enrichActivities([data]);
-    return activity;
-  } catch {
-    return mockGetActivityById(id);
-  }
+  if (error || !data) return undefined;
+  const [activity] = await enrichActivities([data as DbActivity]);
+  return activity;
 }
 
 export async function getOperatorForActivity(activityId: string): Promise<Operator | undefined> {
-  if (!isSupabaseConfigured()) return mockGetOperatorForActivity(activityId);
+  requireSupabase();
+  const activity = await getActivityById(activityId);
+  if (!activity) return undefined;
 
-  try {
-    const activity = await getActivityById(activityId);
-    if (!activity) return undefined;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("operators")
+    .select("*")
+    .eq("id", activity.operatorId)
+    .single();
 
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("operators")
-      .select("*")
-      .eq("id", activity.operatorId)
-      .single();
-
-    if (error || !data) return mockGetOperatorForActivity(activityId);
-    return mapOperator(data as DbOperator);
-  } catch {
-    return mockGetOperatorForActivity(activityId);
-  }
+  if (error || !data) return undefined;
+  return mapOperator(data as DbOperator);
 }
 
 export async function getActivitiesByOperator(operatorId: string): Promise<Activity[]> {
-  if (!isSupabaseConfigured()) {
-    return mockActivities.filter((a) => a.operatorId === operatorId);
+  requireSupabase();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*")
+    .eq("operator_id", operatorId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  if (!data) return [];
+  return enrichActivities(data as DbActivity[]);
+}
+
+export interface CreateActivityInput {
+  operatorId: string;
+  title: string;
+  description: string;
+  district: string;
+  locationName: string;
+  category: ActivityCategory;
+  difficulty: "EASY" | "MODERATE" | "HARD";
+  durationMinutes: number;
+  basePrice: number;
+  coverImageUrl: string;
+  includes: string[];
+  elevation?: string;
+}
+
+export async function createActivity(input: CreateActivityInput): Promise<Activity> {
+  requireSupabase();
+  const supabase = await createClient();
+
+  const { data: activityData, error: activityError } = await supabase
+    .from("activities")
+    .insert({
+      operator_id: input.operatorId,
+      title: input.title,
+      description: input.description,
+      district: input.district,
+      location_name: input.locationName,
+      category: input.category,
+      difficulty: input.difficulty,
+      duration_minutes: input.durationMinutes,
+      cover_image_url: input.coverImageUrl,
+      base_price: input.basePrice,
+      is_active: true,
+      elevation: input.elevation || null,
+    })
+    .select()
+    .single();
+
+  if (activityError || !activityData) {
+    throw new Error(activityError?.message || "Failed to create activity");
   }
 
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("activities")
-      .select("*")
-      .eq("operator_id", operatorId)
-      .order("title");
+  if (input.includes.length > 0) {
+    const includesData = input.includes.map((item) => ({
+      activity_id: activityData.id,
+      item_name: item,
+    }));
 
-    if (error || !data) {
-      return mockActivities.filter((a) => a.operatorId === operatorId);
+    const { error: includesError } = await supabase
+      .from("activity_includes")
+      .insert(includesData);
+
+    if (includesError) {
+      throw new Error(includesError.message);
     }
-    return enrichActivities(data);
-  } catch {
-    return mockActivities.filter((a) => a.operatorId === operatorId);
   }
+
+  const activity = mapActivity(activityData as DbActivity, input.includes, 0, 0);
+  await generateDefaultSlotsForActivity(activityData.id);
+  return activity;
 }

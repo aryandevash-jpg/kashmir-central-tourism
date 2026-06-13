@@ -1,4 +1,4 @@
-import { IncidentsPanel } from "@/components/gov/IncidentsPanel";
+import { IncidentManager } from "@/components/gov/IncidentManager";
 import { getIncidents, getOperators } from "@/lib/services";
 
 export default async function GovIncidentsPage() {
@@ -14,16 +14,9 @@ export default async function GovIncidentsPage() {
           <h1 className="text-2xl font-bold text-slate-900">Incident & Safety Log</h1>
           <p className="text-slate-500">Reported incidents across all J&K tourism activities — real-time feed</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          {["Severity", "Status", "District", "Last 30 days"].map((f) => (
-            <select key={f} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
-              <option>{f === "Last 30 days" ? "Last 30 days" : `All ${f}`}</option>
-            </select>
-          ))}
-        </div>
       </div>
 
-      <IncidentsPanel incidents={incidents} operators={operators} />
+      <IncidentManager incidents={incidents} operators={operators} />
     </div>
   );
 }

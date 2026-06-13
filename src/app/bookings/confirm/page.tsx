@@ -23,21 +23,28 @@ function ConfirmContent() {
 
   const [activity, setActivity] = useState<Activity | null>(null);
   const [operator, setOperator] = useState<Operator | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!validation.valid || !activityId ? false : true);
 
   useEffect(() => {
     if (!validation.valid || !activityId) {
-      setLoading(false);
       return;
     }
+    let cancelled = false;
     import("@/lib/api/client")
       .then(({ api }) => api.getActivity(activityId))
       .then((data) => {
-        setActivity(data.activity ?? null);
-        setOperator(data.operator ?? null);
+        if (!cancelled) {
+          setActivity(data.activity ?? null);
+          setOperator(data.operator ?? null);
+        }
       })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
   }, [activityId, validation.valid]);
 
   if (!validation.valid) {
@@ -99,7 +106,7 @@ function ConfirmContent() {
 
 export default function BookingConfirmPage() {
   return (
-    <div className="min-h-screen bg-[#f0f7ff]">
+    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
       <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
         <ConfirmContent />

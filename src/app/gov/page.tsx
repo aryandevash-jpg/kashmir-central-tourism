@@ -19,7 +19,7 @@ export default async function GovOverviewPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Department Overview</h1>
           <p className="text-slate-500">State-wide tourism activity and compliance monitoring</p>
@@ -45,15 +45,15 @@ export default async function GovOverviewPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="font-bold text-slate-900">District Activity Map — Jammu & Kashmir</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <h2 className="font-bold text-slate-900">District Activity Map — J&K</h2>
           <p className="text-sm text-slate-500">Booking density by district</p>
-          <div className="mt-6 flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-blue-100">
-            <div className="grid grid-cols-3 gap-3 p-8">
+          <div className="mt-4 flex min-h-[200px] items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 sm:mt-6 sm:min-h-[240px]">
+            <div className="grid w-full grid-cols-2 gap-2 p-3 sm:grid-cols-3 sm:gap-3 sm:p-6">
               {districts.map((d) => (
                 <div
                   key={d.id}
-                  className="rounded-lg px-4 py-3 text-center text-sm font-medium text-white shadow-sm"
+                  className="rounded-lg px-2 py-2.5 text-center text-xs font-medium text-white shadow-sm sm:px-4 sm:py-3 sm:text-sm"
                   style={{
                     background: d.alertStatus === "ACTIVE" ? "#1d4ed8" : d.alertStatus === "MODERATE" ? "#60a5fa" : "#93c5fd",
                   }}
@@ -63,37 +63,58 @@ export default async function GovOverviewPage() {
               ))}
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-4 text-xs text-slate-500">
-            <span className="flex items-center gap-1"><span className="h-3 w-8 rounded bg-blue-800" /> High Activity</span>
-            <span className="flex items-center gap-1"><span className="h-3 w-8 rounded bg-blue-300" /> Low Activity</span>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500 sm:mt-4 sm:gap-4">
+            <span className="flex items-center gap-1"><span className="h-2.5 w-6 rounded bg-blue-800 sm:w-8" /> High</span>
+            <span className="flex items-center gap-1"><span className="h-2.5 w-6 rounded bg-blue-300 sm:w-8" /> Low</span>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="font-bold text-slate-900">District Breakdown</h2>
-          <table className="mt-4 w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-left text-xs uppercase text-slate-400">
-                <th className="pb-3">District</th>
-                <th className="pb-3">Bookings</th>
-                <th className="pb-3">Revenue</th>
-                <th className="pb-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {districts.map((d) => (
-                <tr key={d.id} className="border-b border-slate-50">
-                  <td className="py-3 font-medium">{d.name}</td>
-                  <td className="py-3 text-slate-600">{d.totalBookings.toLocaleString()}</td>
-                  <td className="py-3 text-slate-600">{formatCurrency(d.totalRevenue)}</td>
-                  <td className="py-3">
-                    <span className={`inline-block h-2.5 w-2.5 rounded-full ${alertColors[d.alertStatus]}`} />
-                  </td>
+          
+          {/* Mobile card layout */}
+          <div className="mt-4 space-y-2 sm:hidden">
+            {districts.map((d) => (
+              <div key={d.id} className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2.5">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${alertColors[d.alertStatus]}`} />
+                  <span className="font-medium text-sm">{d.name}</span>
+                </div>
+                <div className="text-right text-xs">
+                  <p className="font-semibold text-slate-900">{formatCurrency(d.totalRevenue)}</p>
+                  <p className="text-slate-500">{d.totalBookings.toLocaleString()} bookings</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Desktop table layout */}
+          <div className="hidden sm:block">
+            <table className="mt-4 w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-left text-xs uppercase text-slate-400">
+                  <th className="pb-3">District</th>
+                  <th className="pb-3">Bookings</th>
+                  <th className="pb-3">Revenue</th>
+                  <th className="pb-3">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="mt-4 flex gap-4 text-xs text-slate-500">
+              </thead>
+              <tbody>
+                {districts.map((d) => (
+                  <tr key={d.id} className="border-b border-slate-50">
+                    <td className="py-3 font-medium">{d.name}</td>
+                    <td className="py-3 text-slate-600">{d.totalBookings.toLocaleString()}</td>
+                    <td className="py-3 text-slate-600">{formatCurrency(d.totalRevenue)}</td>
+                    <td className="py-3">
+                      <span className={`inline-block h-2.5 w-2.5 rounded-full ${alertColors[d.alertStatus]}`} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500 sm:gap-4">
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-green-500" /> Active</span>
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" /> Moderate</span>
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" /> Alert</span>
