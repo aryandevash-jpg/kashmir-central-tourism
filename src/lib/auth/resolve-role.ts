@@ -16,6 +16,9 @@ export async function resolveUserRole(
   supabase: SupabaseClient,
   user: User
 ): Promise<UserRole | null> {
+  const metaRole = roleFromAuthUser(user);
+  if (metaRole) return metaRole;
+
   const { data } = await supabase
     .from("users")
     .select("role")
@@ -26,5 +29,5 @@ export async function resolveUserRole(
     return data.role as UserRole;
   }
 
-  return roleFromAuthUser(user);
+  return null;
 }

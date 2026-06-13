@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TouristNav } from "@/components/tourist/TouristNav";
 import { IconChevronLeft } from "@/components/icons";
-import { getActivityById, getOperatorForActivity } from "@/lib/services";
+import { getActivityWithOperator } from "@/lib/services";
 import { ActivityDetail } from "./ActivityDetail";
 
 export default async function ActivityDetailPage({
@@ -11,10 +11,10 @@ export default async function ActivityDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const activity = await getActivityById(id);
-  if (!activity) notFound();
+  const result = await getActivityWithOperator(id);
+  if (!result) notFound();
 
-  const operator = await getOperatorForActivity(id);
+  const { activity, operator } = result;
 
   return (
     <div className="min-h-screen bg-[#f0f7ff] tourist-page">

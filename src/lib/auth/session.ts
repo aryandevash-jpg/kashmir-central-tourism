@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/lib/types";
 import { roleFromAuthUser } from "./resolve-role";
@@ -11,7 +12,7 @@ export interface AuthProfile {
   role: UserRole;
 }
 
-export async function getSessionUser() {
+export const getSessionUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,13 +21,17 @@ export async function getSessionUser() {
 
   if (error || !user) return null;
   return user;
-}
+});
 
-export async function getAuthProfile(): Promise<AuthProfile | null> {
-  const user = await getSessionUser();
-  if (!user) return null;
-
+export const getAuthProfile = cache(async (): Promise<AuthProfile | null> => {
   const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) return null;
+
   const { data } = await supabase
     .from("users")
     .select("id, name, email, phone, role")
@@ -53,7 +58,7 @@ export async function getAuthProfile(): Promise<AuthProfile | null> {
     phone: undefined,
     role,
   };
-}
+});
 
 export async function requireAuth(): Promise<AuthProfile> {
   const profile = await getAuthProfile();
@@ -69,7 +74,7 @@ export async function requireRole(roles: UserRole[]): Promise<AuthProfile> {
   return profile;
 }
 
-export async function getOperatorIdForUser(userId: string): Promise<string | null> {
+export const getOperatorIdForUser = cache(async (userId: string): Promise<string | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("operators")
@@ -79,7 +84,7 @@ export async function getOperatorIdForUser(userId: string): Promise<string | nul
 
   if (error || !data) return null;
   return data.id;
-}
+});
 
 export async function requireOperatorId(): Promise<{ profile: AuthProfile; operatorId: string }> {
   const profile = await requireRole(["OPERATOR", "SUPER_ADMIN"]);

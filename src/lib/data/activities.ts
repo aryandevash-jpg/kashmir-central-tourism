@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
 import { requireSupabase } from "@/lib/supabase/require";
 import type { DbActivity, DbOperator } from "@/lib/supabase/database.types";
 import type { Activity, ActivityCategory, Operator } from "@/lib/types";
@@ -62,7 +63,7 @@ export async function getActivities(category?: ActivityCategory): Promise<Activi
   return enrichActivities(rows);
 }
 
-export async function getActivityById(id: string): Promise<Activity | undefined> {
+export const getActivityById = cache(async (id: string): Promise<Activity | undefined> => {
   requireSupabase();
   const supabase = await createClient();
   const { data, error } = await supabase.from("activities").select("*").eq("id", id).single();
@@ -70,11 +71,14 @@ export async function getActivityById(id: string): Promise<Activity | undefined>
   if (error || !data) return undefined;
   const [activity] = await enrichActivities([data as DbActivity]);
   return activity;
-}
+});
 
-export async function getOperatorForActivity(activityId: string): Promise<Operator | undefined> {
+export async function getOperatorForActivity(
+  activityId: string,
+  knownActivity?: Activity
+): Promise<Operator | undefined> {
   requireSupabase();
-  const activity = await getActivityById(activityId);
+  const activity = knownActivity ?? (await getActivityById(activityId));
   if (!activity) return undefined;
 
   const supabase = await createClient();
@@ -86,6 +90,13 @@ export async function getOperatorForActivity(activityId: string): Promise<Operat
 
   if (error || !data) return undefined;
   return mapOperator(data as DbOperator);
+}
+
+export async function getActivityWithOperator(id: string) {
+  const activity = await getActivityById(id);
+  if (!activity) return undefined;
+  const operator = await getOperatorForActivity(id, activity);
+  return { activity, operator };
 }
 
 export async function getActivitiesByOperator(operatorId: string): Promise<Activity[]> {

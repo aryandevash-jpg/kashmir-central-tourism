@@ -81,6 +81,28 @@ export async function getOperatorBookings(operatorId: string): Promise<BookingWi
   }));
 }
 
+/** Lightweight count for sidebar badge — one query when activities exist */
+export async function getOperatorBookingCount(operatorId: string): Promise<number> {
+  requireSupabase();
+  const supabase = await createClient();
+
+  const { data: activities, error: actError } = await supabase
+    .from("activities")
+    .select("id")
+    .eq("operator_id", operatorId);
+
+  if (actError || !activities?.length) return 0;
+
+  const activityIds = activities.map((a) => a.id);
+  const { count, error } = await supabase
+    .from("bookings")
+    .select("id", { count: "exact", head: true })
+    .in("activity_id", activityIds);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
 export interface CreateBookingInput {
   userId: string;
   activityId: string;

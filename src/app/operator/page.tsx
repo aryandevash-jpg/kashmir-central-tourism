@@ -1,12 +1,16 @@
+import dynamic from "next/dynamic";
 import {
   getActivitiesByOperator,
   getOperatorBookings,
 } from "@/lib/services";
 import { requireOperatorId } from "@/lib/auth/session";
 import type { BookingWithDetails } from "@/lib/data/bookings";
-import { OperatorDashboardClient } from "./OperatorDashboardClient";
+import { OperatorPageSkeleton } from "@/components/skeletons";
 
-export const dynamic = "force-dynamic";
+const OperatorDashboardClient = dynamic(
+  () => import("./OperatorDashboardClient").then((m) => m.OperatorDashboardClient),
+  { loading: () => <OperatorPageSkeleton /> }
+);
 
 function computeMonthlyRevenue(bookings: BookingWithDetails[]) {
   const byMonth = new Map<string, number>();

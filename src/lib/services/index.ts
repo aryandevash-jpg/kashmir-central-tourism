@@ -7,6 +7,7 @@
 export {
   getActivities,
   getActivityById,
+  getActivityWithOperator,
   getOperatorForActivity,
   getActivitiesByOperator,
   createActivity,
@@ -28,6 +29,7 @@ export {
 export {
   getBookingsForUser,
   getOperatorBookings,
+  getOperatorBookingCount,
   createBooking,
 } from "@/lib/data/bookings";
 

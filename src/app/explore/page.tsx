@@ -1,18 +1,18 @@
+import { Suspense } from "react";
 import { TouristNav } from "@/components/tourist/TouristNav";
-import { ExploreFeed } from "@/components/tourist/ExploreFeed";
-import { getActivities } from "@/lib/services";
+import { ExplorePageSkeleton } from "@/components/skeletons";
 import { roleOrRedirect } from "@/lib/auth/guards";
-
-export const dynamic = "force-dynamic";
+import { ExploreActivities } from "./ExploreActivities";
 
 export default async function ExplorePage() {
   await roleOrRedirect(["TOURIST", "SUPER_ADMIN"], "/explore");
-  const activities = await getActivities();
 
   return (
     <div className="min-h-screen bg-[#f0f7ff] tourist-page">
       <TouristNav />
-      <ExploreFeed activities={activities} />
+      <Suspense fallback={<ExplorePageSkeleton />}>
+        <ExploreActivities />
+      </Suspense>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { fail, handleRouteError, ok } from "@/lib/api/http";
-import { getActivityById, getOperatorForActivity } from "@/lib/services";
+import { getActivityWithOperator } from "@/lib/services";
 
 export async function GET(
   _request: Request,
@@ -7,13 +7,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const [activity, operator] = await Promise.all([
-      getActivityById(id),
-      getOperatorForActivity(id),
-    ]);
+    const result = await getActivityWithOperator(id);
 
-    if (!activity) return fail("Activity not found", 404);
-    return ok({ activity, operator });
+    if (!result) return fail("Activity not found", 404);
+    return ok({ activity: result.activity, operator: result.operator });
   } catch (err) {
     return handleRouteError(err);
   }

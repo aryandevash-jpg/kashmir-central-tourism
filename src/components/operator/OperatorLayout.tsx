@@ -1,16 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   IconBell,
-  IconCalendar,
-  IconChart,
   IconMountain,
-  IconSettings,
 } from "@/components/icons";
-import { MobileNavDrawer, type MobileNavItem } from "@/components/MobileNavDrawer";
-import { cn } from "@/lib/utils";
+import { MobileNavDrawer } from "@/components/MobileNavDrawer";
+import { OperatorSidebarNav, useOperatorNavItems } from "@/components/operator/OperatorSidebarNav";
 import type { AuthProfile } from "@/lib/auth/session";
 import type { Operator } from "@/lib/types";
 
@@ -23,74 +19,16 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-const baseNavItems: MobileNavItem[] = [
-  { href: "/operator", label: "Dashboard", icon: IconChart, exact: true },
-  { href: "/operator/bookings", label: "Bookings", icon: IconCalendar },
-  { href: "/operator/activities", label: "Activities", icon: IconMountain },
-  { href: "/operator/analytics", label: "Analytics", icon: IconChart },
-  { href: "/operator/settings", label: "Settings", icon: IconSettings },
-];
-
-function buildNavItems(bookingCount: number): MobileNavItem[] {
-  return baseNavItems.map((item) =>
-    item.href === "/operator/bookings" ? { ...item, badge: bookingCount } : item
-  );
-}
-
-function SidebarNav({
-  pathname,
-  navItems,
-}: {
-  pathname: string;
-  navItems: MobileNavItem[];
-}) {
-  return (
-    <>
-      {navItems.map(({ href, label, icon: Icon, exact, badge }) => {
-        const active = exact ? pathname === href : pathname.startsWith(href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-              active ? "bg-blue-500 text-white" : "text-slate-600 hover:bg-slate-50",
-            )}
-          >
-            <span className="flex items-center gap-3">
-              <Icon className="h-5 w-5" />
-              {label}
-            </span>
-            {badge !== undefined && (
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-xs font-semibold",
-                  active ? "bg-blue-400" : "bg-blue-100 text-blue-600",
-                )}
-              >
-                {badge}
-              </span>
-            )}
-          </Link>
-        );
-      })}
-    </>
-  );
-}
-
 export function OperatorLayout({
   children,
   profile,
   operator,
-  bookingCount = 0,
 }: {
   children: React.ReactNode;
   profile: AuthProfile;
   operator?: Operator;
-  bookingCount?: number;
 }) {
-  const pathname = usePathname();
-  const navItems = buildNavItems(bookingCount);
+  const drawerItems = useOperatorNavItems();
   const companyName = operator?.companyName ?? "Operator Console";
   const nameInitials = initials(profile.name);
 
@@ -124,7 +62,7 @@ export function OperatorLayout({
         </div>
 
         <nav className="flex-1 space-y-1 p-4">
-          <SidebarNav pathname={pathname} navItems={navItems} />
+          <OperatorSidebarNav />
         </nav>
 
         <div className="border-t border-slate-100 p-4">{operatorFooter}</div>
@@ -133,11 +71,7 @@ export function OperatorLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 sm:h-16 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
-            <MobileNavDrawer
-              items={navItems}
-              title={companyName}
-              footer={operatorFooter}
-            />
+            <MobileNavDrawer items={drawerItems} title={companyName} footer={operatorFooter} />
             <div className="flex min-w-0 items-center gap-2 lg:hidden">
               <IconMountain className="h-5 w-5 shrink-0 text-blue-500" />
               <span className="truncate font-bold text-slate-900">{companyName}</span>
