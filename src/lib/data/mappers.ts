@@ -3,6 +3,7 @@ import type {
   Activity,
   Booking,
   District,
+  EventBanner,
   Incident,
   Operator,
   Slot,
@@ -11,6 +12,7 @@ import type {
   DbActivity,
   DbBooking,
   DbDistrict,
+  DbEvent,
   DbIncident,
   DbOperator,
   DbSlot,
@@ -122,5 +124,24 @@ export function mapIncident(row: DbIncident): Incident {
     occurredAt: row.occurred_at,
     resolvedAt: row.resolved_at ?? undefined,
     incidentCode: code,
+  };
+}
+
+export function mapEvent(row: DbEvent): EventBanner {
+  return {
+    id: row.id,
+    title: row.title,
+    message: row.message,
+    district: row.district ?? undefined,
+    category: row.category,
+    priority: row.priority,
+    startsAt: row.starts_at,
+    endsAt: row.ends_at ?? undefined,
+    isPublished: row.is_published,
+    isImportant: row.is_important,
+    sourceLabel: row.source_label ?? undefined,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

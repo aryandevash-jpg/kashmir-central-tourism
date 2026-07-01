@@ -61,7 +61,7 @@ export function enforcePortalAccess(
     return NextResponse.redirect(new URL(portalPathForRole(role), request.url));
   }
 
-  const touristOnlyPrefixes = ["/explore", "/bookings", "/profile", "/report", "/saved", "/activities"];
+  const touristOnlyPrefixes = ["/explore", "/events", "/bookings", "/profile", "/report", "/saved", "/activities"];
   const isTouristRoute = touristOnlyPrefixes.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`)
   );

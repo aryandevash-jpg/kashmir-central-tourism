@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconCalendar, IconCompass, IconHeart, IconUser, IconAlert } from "@/components/icons";
+import { IconCalendar, IconCompass, IconHeart, IconUser, IconAlert, IconBell } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/explore", label: "Explore", icon: IconCompass },
+  { href: "/events", label: "Events", icon: IconAlert },
   { href: "/bookings", label: "Bookings", icon: IconCalendar },
   { href: "/saved", label: "Saved", icon: IconHeart },
-  { href: "/report", label: "Report", icon: IconAlert },
+  { href: "/report", label: "Report", icon: IconBell },
   { href: "/profile", label: "Profile", icon: IconUser },
 ];
 

@@ -9,6 +9,7 @@ ALTER TABLE operators ENABLE ROW LEVEL SECURITY;
 ALTER TABLE districts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incident_actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
@@ -29,6 +30,7 @@ DROP POLICY IF EXISTS "Anon insert activity_includes" ON activity_includes;
 DROP POLICY IF EXISTS "Anon insert slots" ON slots;
 DROP POLICY IF EXISTS "Anon update incidents" ON incidents;
 DROP POLICY IF EXISTS "Anon insert incident_actions" ON incident_actions;
+DROP POLICY IF EXISTS "Public read events" ON events;
 
 -- ---------------------------------------------------------------------------
 -- USERS
@@ -174,6 +176,21 @@ CREATE POLICY "incident_actions_insert" ON incident_actions
       OR public.is_tourist()
     )
   );
+
+-- ---------------------------------------------------------------------------
+-- EVENTS
+-- ---------------------------------------------------------------------------
+CREATE POLICY "events_select_published" ON events
+  FOR SELECT USING (is_published = true OR public.is_gov_officer());
+
+CREATE POLICY "events_insert_gov" ON events
+  FOR INSERT WITH CHECK (
+    public.is_gov_officer()
+    AND created_by = auth.uid()
+  );
+
+CREATE POLICY "events_update_gov" ON events
+  FOR UPDATE USING (public.is_gov_officer());
 
 -- ---------------------------------------------------------------------------
 -- DISTRICTS & REVIEWS (read-only catalog data)

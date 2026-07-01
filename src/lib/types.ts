@@ -16,6 +16,8 @@ export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 export type IncidentSeverity = "LOW" | "HIGH" | "CRITICAL";
 export type IncidentStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED";
 export type IncidentActionType = "REPORTED" | "ESCALATED" | "REVIEWED" | "RESOLVED";
+export type EventCategory = "GENERAL" | "SAFETY" | "WEATHER" | "TRAFFIC" | "CULTURE";
+export type EventPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type AlertStatus = "ACTIVE" | "MODERATE" | "ALERT";
 export type ComplianceResult = "PASS" | "FAIL" | "CONDITIONAL";
 
@@ -122,4 +124,21 @@ export interface IncidentAction {
   actionType: IncidentActionType;
   note?: string;
   actedAt: string;
+}
+
+export interface EventBanner {
+  id: string;
+  title: string;
+  message: string;
+  district?: string;
+  category: EventCategory;
+  priority: EventPriority;
+  startsAt: string;
+  endsAt?: string;
+  isPublished: boolean;
+  isImportant: boolean;
+  sourceLabel?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
 }

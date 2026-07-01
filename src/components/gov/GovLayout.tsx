@@ -30,6 +30,7 @@ const monitoringNavItems = [
   { href: "/gov/analytics", label: "Activity Analytics", icon: IconChart },
   { href: "/gov/compliance", label: "Operator Compliance", icon: IconShield },
   { href: "/gov/incidents", label: "Incident & Safety Log", icon: IconAlert },
+  { href: "/gov/events", label: "Important Events", icon: IconBell },
   { href: "/gov/notifications", label: "Notifications", icon: IconBell },
 ];
 
@@ -43,6 +44,7 @@ const pageLabels: Record<string, string> = {
   "/gov/analytics": "Activity Analytics",
   "/gov/compliance": "Operator Compliance",
   "/gov/incidents": "Incident & Safety Log",
+  "/gov/events": "Important Events",
   "/gov/notifications": "Notifications",
   "/gov/settings": "Settings",
   "/gov/vendors/register": "Register Vendor",

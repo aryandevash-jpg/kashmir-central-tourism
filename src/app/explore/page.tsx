@@ -8,11 +8,13 @@ export default async function ExplorePage() {
   await roleOrRedirect(["TOURIST", "SUPER_ADMIN"], "/explore");
 
   return (
-    <div className="min-h-screen bg-[#f0f7ff] tourist-page">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[#f0f7ff]">
       <TouristNav />
-      <Suspense fallback={<ExplorePageSkeleton />}>
-        <ExploreActivities />
-      </Suspense>
+      <div className="min-h-0 flex-1">
+        <Suspense fallback={<ExplorePageSkeleton />}>
+          <ExploreActivities />
+        </Suspense>
+      </div>
     </div>
   );
 }

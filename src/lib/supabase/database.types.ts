@@ -5,7 +5,8 @@ import type {
   ComplianceResult,
   ComplianceStatus,
   DifficultyLevel,
-  IncidentActionType,
+  EventCategory,
+  EventPriority,
   IncidentSeverity,
   IncidentStatus,
   LicenseStatus,
@@ -114,6 +115,23 @@ export interface DbIncident {
   resolved_at: string | null;
 }
 
+export interface DbEvent {
+  id: string;
+  title: string;
+  message: string;
+  district: string | null;
+  category: EventCategory;
+  priority: EventPriority;
+  starts_at: string;
+  ends_at: string | null;
+  is_published: boolean;
+  is_important: boolean;
+  source_label: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbDistrict {
   id: string;
   name: string;
@@ -146,6 +164,7 @@ export interface Database {
       bookings: { Row: DbBooking; Insert: Partial<DbBooking>; Update: Partial<DbBooking> };
       reviews: { Row: DbReview; Insert: Partial<DbReview>; Update: Partial<DbReview> };
       incidents: { Row: DbIncident; Insert: Partial<DbIncident>; Update: Partial<DbIncident> };
+      events: { Row: DbEvent; Insert: Partial<DbEvent>; Update: Partial<DbEvent> };
       districts: { Row: DbDistrict; Insert: Partial<DbDistrict>; Update: Partial<DbDistrict> };
       compliance_checks: { Row: DbComplianceCheck; Insert: Partial<DbComplianceCheck>; Update: Partial<DbComplianceCheck> };
     };

@@ -31,6 +31,12 @@ DO $$ BEGIN
   CREATE TYPE incident_action_type AS ENUM ('REPORTED', 'ESCALATED', 'REVIEWED', 'RESOLVED');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
+  CREATE TYPE event_category AS ENUM ('GENERAL', 'SAFETY', 'WEATHER', 'TRAFFIC', 'CULTURE');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE TYPE event_priority AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
   CREATE TYPE alert_status AS ENUM ('ACTIVE', 'MODERATE', 'ALERT');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
@@ -149,6 +155,24 @@ CREATE TABLE IF NOT EXISTS incident_actions (
     action_type incident_action_type NOT NULL,
     note TEXT,
     acted_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    district VARCHAR(100),
+    category event_category NOT NULL DEFAULT 'GENERAL',
+    priority event_priority NOT NULL DEFAULT 'MEDIUM',
+    starts_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ends_at TIMESTAMPTZ,
+    is_published BOOLEAN NOT NULL DEFAULT true,
+    is_important BOOLEAN NOT NULL DEFAULT true,
+    source_label VARCHAR(120),
+    created_by UUID NOT NULL REFERENCES users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT events_window_valid CHECK (ends_at IS NULL OR ends_at >= starts_at)
 );
 
 CREATE TABLE IF NOT EXISTS districts (

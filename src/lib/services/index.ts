@@ -46,5 +46,12 @@ export {
   updateIncidentStatus,
   createIncident,
 } from "@/lib/data/incidents";
+export {
+  getPublishedEvents,
+  getImportantEvents,
+  getGovEvents,
+  createEvent,
+  updateEvent,
+} from "@/lib/data/events";
 
 export { isSupabaseConfigured } from "@/lib/supabase/server";

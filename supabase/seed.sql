@@ -21,6 +21,7 @@ TRUNCATE TABLE
   reviews,
   bookings,
   incidents,
+  events,
   slots,
   activity_includes,
   activities,
@@ -71,6 +72,59 @@ INSERT INTO users (id, name, email, phone, role, password_hash) VALUES
   ('00000000-0000-0000-0000-000000000022', 'Sneha Patel',          'sneha.patel@gmail.com',     '9419200004', 'TOURIST', '$2b$10$placeholder_hash'),
   ('00000000-0000-0000-0000-000000000023', 'Vikram Singh',         'vikram.singh@gmail.com',    '9419200005', 'TOURIST', '$2b$10$placeholder_hash'),
   ('00000000-0000-0000-0000-000000000024', 'Anita Desai',          'anita.desai@gmail.com',     '9419200006', 'TOURIST', '$2b$10$placeholder_hash');
+
+-- ============================================================================
+-- EVENTS - Government advisories and important announcements
+-- ============================================================================
+INSERT INTO events (id, title, message, district, category, priority, starts_at, ends_at, is_published, is_important, source_label, created_by) VALUES
+  ('00000000-0000-0000-0000-00000000e101',
+   'Official Advisory',
+   'Weather update, route changes, and event announcements are available for today.',
+   NULL,
+   'GENERAL',
+   'HIGH',
+   NOW() - interval '3 hours',
+   NOW() + interval '2 days',
+   true,
+   true,
+   'Official advisory',
+   '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0000-00000000e102',
+   'Sunrise Trek Slots Open',
+   'New sunrise trek slots for Sonamarg have opened for this weekend. Arrive 30 minutes early for safety checks.',
+   'Ganderbal',
+   'CULTURE',
+   'MEDIUM',
+   NOW() - interval '6 hours',
+   NOW() + interval '5 days',
+   true,
+   true,
+   'Tourism operations desk',
+   '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0000-00000000e103',
+   'Dal Lake Morning Briefing',
+   'Boat safety briefing is mandatory at 6:00 AM for all sunrise shikara passengers.',
+   'Srinagar',
+   'SAFETY',
+   'HIGH',
+   NOW() - interval '12 hours',
+   NOW() + interval '10 days',
+   true,
+   true,
+   'Lake safety control room',
+   '00000000-0000-0000-0000-000000000002'),
+  ('00000000-0000-0000-0000-00000000e104',
+   'Traffic Diversion Near Gulmarg Road',
+   'Temporary diversion in place due to hillside repair work. Expect 20-30 minutes additional travel time.',
+   'Baramulla',
+   'TRAFFIC',
+   'MEDIUM',
+   NOW() - interval '1 day',
+   NOW() + interval '3 days',
+   true,
+   false,
+   'District transport cell',
+   '00000000-0000-0000-0000-000000000002');
 
 -- ============================================================================
 -- OPERATORS - Tourism service providers
@@ -405,6 +459,7 @@ ALTER TABLE slots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incident_actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Anon insert activities" ON activities;
 CREATE POLICY "Anon insert activities" ON activities FOR INSERT WITH CHECK (true);
@@ -427,6 +482,12 @@ CREATE POLICY "Anon update incidents" ON incidents FOR UPDATE USING (true);
 DROP POLICY IF EXISTS "Anon insert incident_actions" ON incident_actions;
 CREATE POLICY "Anon insert incident_actions" ON incident_actions FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public read events" ON events;
+CREATE POLICY "Public read events" ON events FOR SELECT USING (is_published = true);
+
+DROP POLICY IF EXISTS "Gov manage events" ON events;
+CREATE POLICY "Gov manage events" ON events FOR ALL USING (true);
+
 COMMIT;
 
 -- ============================================================================
@@ -439,5 +500,6 @@ UNION ALL SELECT 'activities', count(*)::int FROM activities
 UNION ALL SELECT 'slots', count(*)::int FROM slots
 UNION ALL SELECT 'bookings', count(*)::int FROM bookings
 UNION ALL SELECT 'incidents', count(*)::int FROM incidents
+UNION ALL SELECT 'events', count(*)::int FROM events
 UNION ALL SELECT 'reviews', count(*)::int FROM reviews
 ORDER BY entity;
